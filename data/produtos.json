@@ -1,0 +1,102 @@
+[
+    {
+        "id": 1,
+        "nome": "Arroz",
+        "valor_venda": 10.50
+    },
+    {
+        "id": 2,
+        "nome": "Feijão",
+        "valor_venda": 8.75
+    },
+    {
+        "id": 3,
+        "nome": "Carne",
+        "valor_venda": 25.00
+    },
+    {
+        "id": 4,
+        "nome": "Frango",
+        "valor_venda": 15.50
+    },
+    {
+        "id": 5,
+        "nome": "Pão",
+        "valor_venda": 4.00
+    },
+    {
+        "id": 6,
+        "nome": "Leite",
+        "valor_venda": 3.50
+    },
+    {
+        "id": 7,
+        "nome": "Ovos",
+        "valor_venda": 6.00
+    },
+    {
+        "id": 8,
+        "nome": "Macarrão",
+        "valor_venda": 5.50
+    },
+    {
+        "id": 9,
+        "nome": "Tomate",
+        "valor_venda": 7.00
+    },
+    {
+        "id": 10,
+        "nome": "Batata",
+        "valor_venda": 6.50
+    },
+    {
+        "id": 11,
+        "nome": "Café",
+        "valor_venda": 9.00
+    },
+    {
+        "id": 12,
+        "nome": "Açúcar",
+        "valor_venda": 5.00
+    },
+    {
+        "id": 13,
+        "nome": "Sal",
+        "valor_venda": 4.50
+    },
+    {
+        "id": 14,
+        "nome": "Óleo",
+        "valor_venda": 10.00
+    },
+    {
+        "id": 15,
+        "nome": "Suco",
+        "valor_venda": 8.00
+    },
+    {
+        "id": 16,
+        "nome": "Refrigerante",
+        "valor_venda": 7.50
+    },
+    {
+        "id": 17,
+        "nome": "Chocolate",
+        "valor_venda": 12.00
+    },
+    {
+        "id": 18,
+        "nome": "Biscoito",
+        "valor_venda": 4.50
+    },
+    {
+        "id": 19,
+        "nome": "Iogurte",
+        "valor_venda": 6.50
+    },
+    {
+        "id": 20,
+        "nome": "Queijo",
+        "valor_venda": 11.00
+    }
+]

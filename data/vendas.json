@@ -1,0 +1,102 @@
+[
+    {
+        "produto_id": 1,
+        "estado": "SP",
+        "valor": 11.00
+    },
+    {
+        "produto_id": 1,
+        "estado": "RJ",
+        "valor": 10.50
+    },
+    {
+        "produto_id": 2,
+        "estado": "MG",
+        "valor": 9.00
+    },
+    {
+        "produto_id": 2,
+        "estado": "RS",
+        "valor": 8.75
+    },
+    {
+        "produto_id": 3,
+        "estado": "SC",
+        "valor": 26.00
+    },
+    {
+        "produto_id": 3,
+        "estado": "BA",
+        "valor": 24.50
+    },
+    {
+        "produto_id": 4,
+        "estado": "PR",
+        "valor": 16.00
+    },
+    {
+        "produto_id": 4,
+        "estado": "PE",
+        "valor": 15.00
+    },
+    {
+        "produto_id": 5,
+        "estado": "SP",
+        "valor": 4.20
+    },
+    {
+        "produto_id": 5,
+        "estado": "RJ",
+        "valor": 4.00
+    },
+    {
+        "produto_id": 6,
+        "estado": "MG",
+        "valor": 3.60
+    },
+    {
+        "produto_id": 6,
+        "estado": "RS",
+        "valor": 3.45
+    },
+    {
+        "produto_id": 7,
+        "estado": "SC",
+        "valor": 6.30
+    },
+    {
+        "produto_id": 7,
+        "estado": "BA",
+        "valor": 6.00
+    },
+    {
+        "produto_id": 8,
+        "estado": "PR",
+        "valor": 5.75
+    },
+    {
+        "produto_id": 8,
+        "estado": "PE",
+        "valor": 5.40
+    },
+    {
+        "produto_id": 9,
+        "estado": "SP",
+        "valor": 7.35
+    },
+    {
+        "produto_id": 9,
+        "estado": "RJ",
+        "valor": 6.90
+    },
+    {
+        "produto_id": 10,
+        "estado": "MG",
+        "valor": 6.75
+    },
+    {
+        "produto_id": 10,
+        "estado": "RS",
+        "valor": 6.40
+    }
+]
