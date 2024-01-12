@@ -18,6 +18,13 @@ const ptBR = formatLocale({
 });
 const f = ptBR.format("($.2f");
 
+type EstadoType = { name: string, value: number, percent: number }
+type ProdutoType = {
+    name: string,
+    value: number,
+    estados?: EstadoType[]
+}
+
 export class Visual implements IVisual {
     private body: Selection<HTMLBodyElement, any, any, any>;
 
@@ -30,54 +37,114 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-        console.log("Data", options.dataViews);
+
         this.body.html("");
+        const produtos: ProdutoType[] = options.dataViews[0].matrix.rows.root.children.map(produto => {
+            const totalValue = produto.children[0].children.reduce(
+                (acc, estado) => typeof estado.children[0].value == "number" ? acc + estado.children[0].value : acc
+                , 0);
+            const estados = produto.children[0].children.map(estado => {
+                const vendaEstado = typeof estado.children[0].value == "number" ? estado.children[0].value : 0;
+                return {
+                    name: estado.value,
+                    value: vendaEstado,
+                    percent: vendaEstado / totalValue * 100
+                    ,
+                }
+            });
+
+            return {
+                name: produto.value,
+                value: totalValue,
+                estados
+            } as ProdutoType
+        });
+
+        const totalVendas = produtos.reduce((acc, produto) => acc + produto.value, 0)
+
+
         let table = this.body.append("table")
             .style("border-collapse", "collapse")
             .style("border", "2px black solid")
             .style("width", "100%");
-
         table.append("thead").append("tr")
             .selectAll("th")
-            .data(options.dataViews[0].metadata.columns)
+            .data(["Nome", "Vendas", "%"])
             .enter().append("th")
-            .text(function (d) { return d.displayName })
+            .text(function (d) { return d })
             .style("border", "1px black solid")
             .style("padding", "10px")
             .style("background-color", "lightgray")
             .style("font-weight", "bold")
             .style("text-transform", "uppercase");
 
-        table.append("tbody")
-            .selectAll("tr")
-            .data(options.dataViews[0].table.rows)
-            .enter()
-            .append("tr")
-            .selectAll("td")
-            .data(function (d) { return d; })
-            .enter().append("td")
-            .text(function (d) {
-                if (typeof (d) == "number") {
-                    return f(d);
-                }
-                return d.toString();
-            })
-            .style("background-color", function (d, index) {
-                if (options.dataViews[0].metadata.columns[index].queryName == "produtos.valor_venda" && typeof (d) == "number" && d < 10) {
-                    return "red";
-                }
-                return "white";
+        produtos.forEach((produto, index) => {
+            table.append("tbody").append("tr")
+                .selectAll("td")
+                .data(function () { return [produto.name, produto.value, (produto.value / totalVendas * 100)] })
+                .enter().append("td")
+                .text(function (d, index) {
+                    if (typeof d == "number") {
+                        if (index == 1) return f(d)
+                        return d.toFixed(2) + "%"
+                    }
+                    return d
+                })
+                .style("border", "1px black solid")
+                .style("padding", "10px")
+                .style("text-align", function (d) {
+                    if (typeof d == "number") {
+                        return "right";
+                    }
+                    return "left";
+                })
+                .style("background-color", "gray")
+                .style("cursor", "pointer")
+                .on("click", function (d) {
+                    const childRows = document.querySelectorAll(`.child-product-${index}`);
 
-            })
-            .style("text-align", function (d) {
-                if (typeof (d) == "number") {
-                    return "right";
-                }
-                return "left";
+                    childRows.forEach(row => {
+                        const element = row as HTMLElement;
+                        if (element.style.display === "none" || element.style.display === "") {
+                            element.style.display = "table-row";
+                        } else {
+                            element.style.display = "none";
+                        }
+                    });
+                });
 
-            })
-            .style("border", "1px black solid")
-            .style("padding", "5px");
+            produto.estados.forEach((estado) => {
+                table.append("tbody")
+                    .append("tr")
+                    .attr("class", `child-product-${index}`)
+                    .style("display", "none")
+                    .selectAll("td")
+                    .data(function () { return [estado.name, estado.value, estado.percent] })
+                    .enter().append("td")
+                    .text(function (d, index) {
+                        if (typeof d == "number") {
+                            if (index == 1) return f(d)
+                            return d.toFixed(2) + "%"
+
+                        }
+                        return d
+                    })
+                    .style("border", "1px black solid")
+                    .style("padding", "10px 3px")
+                    .style("background-color", function (d, index) {
+                        if (index == 1 && typeof d == "number" && d < 10) {
+                            return "red";
+                        }
+                        return "white";
+                    })
+                    .style("text-align", function (d) {
+                        if (typeof d == "number") {
+                            return "right";
+                        }
+                        return "left";
+                    })
+            });
+        })
     }
 
 }
