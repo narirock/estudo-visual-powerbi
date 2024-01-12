@@ -16,22 +16,22 @@ type StyleType = {
 
 
 const formatCellValue =
-  (valueType: powerbi.ValueTypeDescriptor,unit) =>
-  (text: any, record: any, index: number) => {
-    if (text == null) {
-      return text;
-    }
-    if (valueType.numeric || valueType.integer) {
-      const num = Number(text);
-      const [n, float] = num.toFixed(2).split(".");
-      const value =  `${[n.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"), float].join(".")}`;
-      return <div>{value}<span className="value-unit"> {unit}</span></div>
-    } else {
-      return <div>{text}<span className="value-unit"> {unit}</span></div>
-      // return `${text}`;
-    }
-    // return text
-  };
+  (valueType: powerbi.ValueTypeDescriptor, unit) =>
+    (text: any, record: any, index: number) => {
+      if (text == null) {
+        return text;
+      }
+      if (valueType.numeric || valueType.integer) {
+        const num = Number(text);
+        const [n, float] = num.toFixed(2).split(".");
+        const value = `${[n.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"), float].join(".")}`;
+        return <div>{value}<span className="value-unit"> {unit}</span></div>
+      } else {
+        return <div>{text}<span className="value-unit"> {unit}</span></div>
+        // return `${text}`;
+      }
+      // return text
+    };
 
 export const genSource = (
   rowsData: powerbi.DataViewMatrix["rows"],
@@ -63,20 +63,20 @@ export const genSource = (
     return dataList;
   };
 
-  const getValueByDataList = (list: Record<string, number[]>,currentLevel) => {
+  const getValueByDataList = (list: Record<string, number[]>, currentLevel) => {
     const vals = {};
     // (list, "list");
     // 取出数据
     for (const key in list) {
-      if(measureIndexes.map(d=>String(d)).indexOf(key)>-1){
+      if (measureIndexes.map(d => String(d)).indexOf(key) > -1) {
         const element = list[key];
         element.forEach((val, i) => {
           vals[`${key}-${i}`] = val;
         });
       }
     }
-    if((rowDetailIndex) && (currentLevel==rowLevel)){
-      vals['rowDetail'] = String(list[rowDetailIndex].filter(d=>d)[0])
+    if ((rowDetailIndex) && (currentLevel == rowLevel)) {
+      vals['rowDetail'] = String(list[rowDetailIndex].filter(d => d)[0])
     }
     return vals;
   };
@@ -102,22 +102,21 @@ export const genSource = (
     if (rowLabelSettings[node.level].showExpand) {
       defaultExpandRowKeys.push(rowKey);
     }
-    subData.className = `ant-table-row-level-${currentLevel}-${
-      index % 2 == 1 ? "odd" : "even"
-    }`;
+    subData.className = `ant-table-row-level-${currentLevel}-${index % 2 == 1 ? "odd" : "even"
+      }`;
     if (node?.values) {
       const res = handlData(node.values!);
-      Object.assign(subData, getValueByDataList(res,currentLevel));
+      Object.assign(subData, getValueByDataList(res, currentLevel));
     } else {
       // if (
       //   !rowDetailsSettings.show.value ||
       //   (rowDetailsSettings.show && node.level !== numOfLevels - 2)
       // ) {
-        subData.children = node.children
-          .filter((d) => !d.isSubtotal)
-          .map((d, i) =>
-            getResult(d, JSON.stringify(d.identity), d.level, d.value, subData)
-          );
+      subData.children = node.children
+        .filter((d) => !d.isSubtotal)
+        .map((d, i) =>
+          getResult(d, JSON.stringify(d.identity), d.level, d.value, subData)
+        );
       // }
 
       // if (rowDetailsSettings.show.value && node.level == numOfLevels - 2) {
@@ -127,7 +126,7 @@ export const genSource = (
       const res = handlData(
         node.children.filter((d) => d.isSubtotal)[0]?.values!
       );
-      Object.assign(subData, getValueByDataList(res,currentLevel));
+      Object.assign(subData, getValueByDataList(res, currentLevel));
     }
     //定义一个存储所有values中有或没有valueSourceIndex的数据集合
     return subData;
@@ -157,7 +156,7 @@ export const genSource = (
 
 export const genColumnFirstHeader = (
   columnData: powerbi.DataViewMatrixNode[],
-  columnLevel:number,
+  columnLevel: number,
   valueSources: powerbi.DataViewMatrix["valueSources"],
   valueTypes: powerbi.ValueTypeDescriptor[],
   valueSettings,
@@ -190,9 +189,9 @@ export const genColumnFirstHeader = (
                 {sortedColumn
                   ? sortedColumn.order === "ascend"
                     ? // <SortUpIcon />
-                      ""
+                    ""
                     : // <SortDownIcon />
-                      ""
+                    ""
                   : ""}
                 {vs.displayName}
               </div>
@@ -203,7 +202,7 @@ export const genColumnFirstHeader = (
             ? (a, b) => a[indexKey] - b[indexKey]
             : false,
           render(value, record, index) {
-            const val = formatCellValue(valueTypes[i],units[i]?.unit||'')(value, record, index);
+            const val = formatCellValue(valueTypes[i], units[i]?.unit || '')(value, record, index);
             return val;
           },
         });
@@ -214,12 +213,11 @@ export const genColumnFirstHeader = (
   };
 
   const handle = (data: powerbi.DataViewMatrixNode[], valueSettings) => {
-    console.log(data,"Data")
     let column = [];
 
     // No columns
-    console.log(columnLevel,"columnLevel")
-    if(columnLevel==0){
+    console.log(columnLevel, "columnLevel")
+    if (columnLevel == 0) {
       const children = genValueSourceColumn(0, valueSettings);
       column = [...children]
       return column
@@ -234,13 +232,13 @@ export const genColumnFirstHeader = (
         options.title = renderTitle("Total", item.level!);
         const children = genValueSourceColumn(item.level!, valueSettings);
         options.children = children;
-        options.render = formatCellValue(valueTypes[i],units[i]?.unit||'');
+        options.render = formatCellValue(valueTypes[i], units[i]?.unit || '');
         column.push(options);
-      } 
+      }
       else {
         options.title = renderTitle(item.value + "", item.level!);
         // Last level of column
-        if(item.level==columnLevel-1){
+        if (item.level == columnLevel - 1) {
           const children = genValueSourceColumn(item.level!, valueSettings);
           options.children = children;
         }
@@ -248,7 +246,7 @@ export const genColumnFirstHeader = (
           options.children = handle(item.children, valueSettings);
         }
         column.push(options);
-      } 
+      }
     });
     return column;
   };
@@ -258,7 +256,7 @@ export const genColumnFirstHeader = (
 
 export const genValueFirstHeader = (
   columnData: powerbi.DataViewMatrixNode[],
-  columnLevel:number,
+  columnLevel: number,
   valueSources: powerbi.DataViewMatrix["valueSources"],
   valueTypes: powerbi.ValueTypeDescriptor[],
   valueSettings: any,
@@ -283,7 +281,7 @@ export const genValueFirstHeader = (
         children.push(options);
         const indexKey = `${vIndex}-${dataIndex}`;
         options.dataIndex = indexKey;
-        options.render = formatCellValue(valueTypes[vIndex],units[vIndex]?.unit||'');
+        options.render = formatCellValue(valueTypes[vIndex], units[vIndex]?.unit || '');
         options.sorter = valueSetting.showSortIcon
           ? (a, b) => a[indexKey] - b[indexKey]
           : false;
@@ -295,7 +293,7 @@ export const genValueFirstHeader = (
           if (!item?.children?.at(0)?.value) {
             const indexKey = `${vIndex}-${dataIndex}`;
             options.dataIndex = indexKey;
-            options.render = formatCellValue(valueTypes[vIndex],units[vIndex]?.unit||'');
+            options.render = formatCellValue(valueTypes[vIndex], units[vIndex]?.unit || '');
             options.sorter = valueSetting.showSortIcon
               ? (a, b) => a[indexKey] - b[indexKey]
               : false;
@@ -303,7 +301,7 @@ export const genValueFirstHeader = (
           } else if (!item?.children) {
             const indexKey = `${vIndex}-${dataIndex}`;
             options.dataIndex = indexKey;
-            options.render = formatCellValue(valueTypes[vIndex],units[vIndex].unit||'');
+            options.render = formatCellValue(valueTypes[vIndex], units[vIndex].unit || '');
             options.sorter = valueSetting.showSortIcon
               ? (a, b) => a[indexKey] - b[indexKey]
               : false;
@@ -326,12 +324,12 @@ export const genValueFirstHeader = (
         key: vs.displayName,
         className: `matrix-col matrix-col-value matrix-col-value-${i + 1}`,
       };
-      if(columnLevel>0){
+      if (columnLevel > 0) {
         col.children = handle(columnData, vsIndex, valueSettings[i]);
       } else {
         const indexKey = `${vsIndex}-${dataIndex}`;
         col.dataIndex = indexKey;
-        col.render = formatCellValue(valueTypes[vsIndex],units[vsIndex]?.unit||'');
+        col.render = formatCellValue(valueTypes[vsIndex], units[vsIndex]?.unit || '');
         col.sorter = valueSettings[vsIndex].showSortIcon
           ? (a, b) => a[indexKey] - b[indexKey]
           : false;

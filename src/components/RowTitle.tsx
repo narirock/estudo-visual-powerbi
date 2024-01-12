@@ -8,12 +8,12 @@ interface IProps {
   rowKeys: string[];
   updateDefaultExpandRowKeys: any;
   defaultExpandRowKeys: any;
-  updateTableKey:any
+  updateTableKey: any
 }
 
 export const RowTitle = (props: IProps) => {
   const [expandedAll, updateExpandedAll] = React.useState(
-    props.defaultExpandRowKeys.length > 0 ? "expanded" : "collapsed"
+    props.defaultExpandRowKeys?.length > 0 ? "expanded" : "collapsed"
   );
 
   const wrapper = useRef(null);
@@ -34,7 +34,7 @@ export const RowTitle = (props: IProps) => {
 
   React.useEffect(() => {
     updateExpandedAll(
-      props.defaultExpandRowKeys.length > 0 ? "expanded" : "collapsed"
+      props.defaultExpandRowKeys?.length > 0 ? "expanded" : "collapsed"
     );
   }, [props.defaultExpandRowKeys]);
 

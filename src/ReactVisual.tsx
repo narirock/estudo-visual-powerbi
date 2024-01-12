@@ -1,13 +1,29 @@
 import * as React from "react";
-import MatrixTable from "./components/MatrixTable";
+import { IProps, MatrixTable } from "./components/MatrixTable";
 
 
-export interface State {
-    text: string;
+export interface State extends IProps {
+    columns: any;
+    dataSource: any;
+    rowKeys: any;
+    defaultExpandRowKeys: any;
+    numOfLevels: number;
+    StyledDiv: any
 }
 
 export const initialState: State = {
-    text: 'initial',
+    tableKey: null,
+    columns: [],
+    dataSource: null,
+    defaultExpandRowKeys: null,
+    rowKeys: null,
+    numOfLevels: null,
+    headerRowHeight: null,
+    rowValueSettings: null,
+    numberOfColumns: null,
+    visualHeight: null,
+    StyledDiv: null,
+    showRowDetail: null
 }
 
 export class ReactVisual extends React.Component<{}, State>{
@@ -21,6 +37,7 @@ export class ReactVisual extends React.Component<{}, State>{
 
     public static update(newState: State) {
         if (typeof ReactVisual.updateCallback === 'function') {
+            console.log("Inside update", newState);
             ReactVisual.updateCallback(newState);
         }
     }
@@ -38,7 +55,19 @@ export class ReactVisual extends React.Component<{}, State>{
     render() {
         return (
             <div className="circleCard">
-                <MatrixTable text={this.state.text} />
+                <MatrixTable
+                    tableKey={this.state.tableKey}
+                    columns={this.state.columns}
+                    dataSource={this.state.dataSource}
+                    defaultExpandRowKeys={this.state.defaultExpandRowKeys}
+                    rowKeys={this.state.rowKeys}
+                    numOfLevels={this.state.numOfLevels}
+                    headerRowHeight={this.state.headerRowHeight}
+                    rowValueSettings={this.state.rowValueSettings}
+                    numberOfColumns={this.state.numberOfColumns}
+                    visualHeight={this.state.visualHeight}
+                    showRowDetail={this.state.showRowDetail}
+                />
             </div>
         )
     }
