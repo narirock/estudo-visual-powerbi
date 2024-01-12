@@ -1,150 +1,118 @@
-"use strict";
+import { genColumnFirstHeader, genSource, genValueFirstHeader } from "./components/js/formatData";
+("use strict");
+
+import { parseSettings } from "./components/js/styleUtils";
+import { ChartSettingsModel } from "./settings";
 
 import powerbi from "powerbi-visuals-api";
-import { formatLocale } from "d3"
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import ReactVisual, { initialState } from "./reactVisual";
 import "./../style/visual.less";
+import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 
-import { select, Selection, style } from 'd3';
-
-const ptBR = formatLocale({
-    decimal: ",",
-    thousands: ".",
-    grouping: [3],
-    currency: ["R$ ", ""]
-});
-const f = ptBR.format("($.2f");
-
-type EstadoType = { name: string, value: number, percent: number }
-type ProdutoType = {
-    name: string,
-    value: number,
-    estados?: EstadoType[]
-}
-
 export class Visual implements IVisual {
-    private body: Selection<HTMLBodyElement, any, any, any>;
+  private target: HTMLElement;
+  private reactRoot: React.ComponentElement<any, any>;
+  private formattingSettings: ChartSettingsModel;
+  private formattingSettingsService: FormattingSettingsService;
 
+  constructor(options: VisualConstructorOptions) {
+    const localizationManager = options.host.createLocalizationManager();
+    this.formattingSettingsService = new FormattingSettingsService(localizationManager);
+    this.reactRoot = React.createElement(ReactVisual, { text: "Bla" });
+    this.target = options.element;
+    ReactDOM.render(this.reactRoot, this.target);
 
+    console.log("Visual constructor", options);
+  }
 
+  public update(options: VisualUpdateOptions) {
+    this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(ChartSettingsModel, options.dataViews[0]);
 
-    constructor(options: VisualConstructorOptions) {
-        this.body = select(options.element).append('body');
-        console.log("created")
+    if (options.dataViews && options.dataViews[0]) {
+      const columns = this.formatData(options);
+      console.log("columns", columns);
+      const dataSource = this.dataSource(options);
+      console.log("datasource", dataSource);
+      const data = options.dataViews[0];
+      ReactVisual.update({
+        text: data.matrix.columns.root.children[0].value.toString(),
+      });
+    } else {
+      this.clear();
     }
 
-    public update(options: VisualUpdateOptions) {
+    ReactDOM.render(this.reactRoot, this.target);
+  }
 
-        this.body.html("");
-        const produtos: ProdutoType[] = options.dataViews[0].matrix.rows.root.children.map(produto => {
-            const totalValue = produto.children[0].children.reduce(
-                (acc, estado) => typeof estado.children[0].value == "number" ? acc + estado.children[0].value : acc
-                , 0);
-            const estados = produto.children[0].children.map(estado => {
-                const vendaEstado = typeof estado.children[0].value == "number" ? estado.children[0].value : 0;
-                return {
-                    name: estado.value,
-                    value: vendaEstado,
-                    percent: vendaEstado / totalValue * 100
-                    ,
-                }
-            });
+  private clear() {
+    ReactVisual.update(initialState);
+  }
 
-            return {
-                name: produto.value,
-                value: totalValue,
-                estados
-            } as ProdutoType
-        });
+  private formatData(options: VisualUpdateOptions) {
+    const valueSettings = parseSettings(this.formattingSettings.valueSettings);
 
-        const totalVendas = produtos.reduce((acc, produto) => acc + produto.value, 0)
+    const valueIndex = options.dataViews[0].matrix.valueSources.map((d, i) => ({
+      index: i,
+      isMeasure: d.roles["measure"] && true,
+      isUnit: d.roles["units"] && true,
+      isRowDetails: d.roles["rowDetails"] && true,
+    }));
 
+    const measureIndexes = valueIndex.filter((d) => d.isMeasure).map((d) => d.index);
 
-        let table = this.body.append("table")
-            .style("border-collapse", "collapse")
-            .style("border", "2px black solid")
-            .style("width", "100%");
-        table.append("thead").append("tr")
-            .selectAll("th")
-            .data(["Nome", "Vendas", "%"])
-            .enter().append("th")
-            .text(function (d) { return d })
-            .style("border", "1px black solid")
-            .style("padding", "10px")
-            .style("background-color", "lightgray")
-            .style("font-weight", "bold")
-            .style("text-transform", "uppercase");
+    const units = valueIndex.filter((d) => d.isUnit).map((d) => d.index);
 
-        produtos.forEach((produto, index) => {
-            table.append("tbody").append("tr")
-                .selectAll("td")
-                .data(function () { return [produto.name, produto.value, (produto.value / totalVendas * 100)] })
-                .enter().append("td")
-                .text(function (d, index) {
-                    if (typeof d == "number") {
-                        if (index == 1) return f(d)
-                        return d.toFixed(2) + "%"
-                    }
-                    return d
-                })
-                .style("border", "1px black solid")
-                .style("padding", "10px")
-                .style("text-align", function (d) {
-                    if (typeof d == "number") {
-                        return "right";
-                    }
-                    return "left";
-                })
-                .style("background-color", "gray")
-                .style("cursor", "pointer")
-                .on("click", function (d) {
-                    const childRows = document.querySelectorAll(`.child-product-${index}`);
-
-                    childRows.forEach(row => {
-                        const element = row as HTMLElement;
-                        if (element.style.display === "none" || element.style.display === "") {
-                            element.style.display = "table-row";
-                        } else {
-                            element.style.display = "none";
-                        }
-                    });
-                });
-
-            produto.estados.forEach((estado) => {
-                table.append("tbody")
-                    .append("tr")
-                    .attr("class", `child-product-${index}`)
-                    .style("display", "none")
-                    .selectAll("td")
-                    .data(function () { return [estado.name, estado.value, estado.percent] })
-                    .enter().append("td")
-                    .text(function (d, index) {
-                        if (typeof d == "number") {
-                            if (index == 1) return f(d)
-                            return d.toFixed(2) + "%"
-
-                        }
-                        return d
-                    })
-                    .style("border", "1px black solid")
-                    .style("padding", "10px 3px")
-                    .style("background-color", function (d, index) {
-                        if (index == 1 && typeof d == "number" && d < 10) {
-                            return "red";
-                        }
-                        return "white";
-                    })
-                    .style("text-align", function (d) {
-                        if (typeof d == "number") {
-                            return "right";
-                        }
-                        return "left";
-                    })
-            });
-        })
+    let columns;
+    if (!this.formattingSettings.rowValueSettings.groupsBeforeValue.value) {
+      columns = genValueFirstHeader(
+        options.dataViews[0].matrix.columns.root.children,
+        options.dataViews[0].matrix.columns.levels.length - 1,
+        options.dataViews[0].matrix.valueSources,
+        options.dataViews[0].matrix.valueSources.map((d) => d.type),
+        valueSettings,
+        measureIndexes,
+        units
+      );
+    } else {
+      columns = genColumnFirstHeader(
+        options.dataViews[0].matrix.columns.root.children,
+        options.dataViews[0].matrix.columns.levels.length - 1,
+        options.dataViews[0].matrix.valueSources,
+        options.dataViews[0].matrix.valueSources.map((d) => d.type),
+        valueSettings,
+        measureIndexes,
+        units
+      );
     }
+    return columns;
+  }
 
+  private dataSource(options: VisualUpdateOptions) {
+    const rowLabelSettings = parseSettings(this.formattingSettings.rowLabelSettings);
+    const valueIndex = options.dataViews[0].matrix.valueSources.map((d, i) => ({
+      index: i,
+      isMeasure: d.roles["measure"] && true,
+      isUnit: d.roles["units"] && true,
+      isRowDetails: d.roles["rowDetails"] && true,
+    }));
+    const measureIndexes = valueIndex.filter((d) => d.isMeasure).map((d) => d.index);
+    const rowDetailIndex = valueIndex.filter((d) => d.isRowDetails)[0]?.index || null;
+
+    const dataSource = genSource(
+      options.dataViews[0].matrix.rows,
+      options.dataViews[0].matrix.valueSources,
+      rowLabelSettings,
+      this.formattingSettings.rowDetailsSettings,
+      measureIndexes,
+      rowDetailIndex,
+      options.dataViews[0].matrix.rows.levels.length - 1
+    );
+    return dataSource;
+  }
 }

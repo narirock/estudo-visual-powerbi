@@ -1,89 +1,89 @@
 {
-    "dataRoles": [
-        {
-            "name": "Category",
-            "displayName": "Linhas",
-            "displayNameKey": "Visual_Category",
-            "kind": "Grouping"
-        },
-        {
-            "name": "Column",
-            "displayName": "Colunas",
-            "displayNameKey": "Visual_Column",
-            "kind": "Grouping"
-        },
-        {
-            "name": "Measure",
-            "displayName": "valores",
-            "displayNameKey": "Visual_Values",
-            "kind": "Measure"
-        }
-    ],
-    "dataViewMappings": [
-        {
-            "matrix": {
-                "rows": {
-                    "for": {
-                        "in": "Category"
-                    }
-                },
-                "columns": {
-                    "for": {
-                        "in": "Column"
-                    }
-                },
-                "values": {
-                    "select": [
-                        {
-                            "for": {
-                                "in": "Measure"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    ],
-    "objects": {
-        "dataPoint": {
-            "properties": {
-                "defaultColor": {
-                    "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
-                    }
-                },
-                "showAllDataPoints": {
-                    "type": {
-                        "bool": true
-                    }
-                },
-                "fill": {
-                    "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
-                    }
-                },
-                "fillRule": {
-                    "type": {
-                        "fill": {}
-                    }
-                },
-                "fontSize": {
-                    "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
-                    }
-                }
-            }
-        }
+  "dataRoles": [
+    {
+      "name": "Line",
+      "displayName": "Linhas",
+      "displayNameKey": "Visual_Line",
+      "kind": "Grouping"
     },
-    "privileges": []
+    {
+      "name": "Column",
+      "displayName": "Colunas",
+      "displayNameKey": "Visual_Column",
+      "kind": "Grouping"
+    },
+    {
+      "name": "Value",
+      "displayName": "Valores",
+      "displayNameKey": "Visual_Values",
+      "kind": "Measure"
+    }
+  ],
+  "dataViewMappings": [
+    {
+      "matrix": {
+        "rows": {
+          "for": {
+            "in": "Line"
+          }
+        },
+        "columns": {
+          "for": {
+            "in": "Column"
+          }
+        },
+        "values": {
+          "select": [
+            {
+              "for": {
+                "in": "Value"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "objects": {
+    "dataPoint": {
+      "properties": {
+        "defaultColor": {
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "showAllDataPoints": {
+          "type": {
+            "bool": true
+          }
+        },
+        "fill": {
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "fillRule": {
+          "type": {
+            "fill": {}
+          }
+        },
+        "fontSize": {
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "privileges": []
 }
