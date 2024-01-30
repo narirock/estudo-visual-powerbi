@@ -34,7 +34,10 @@ export class Visual implements IVisual {
 
   // eslint-disable-next-line max-lines-per-function
   public update(options: VisualUpdateOptions) {
-
+    const headerData = [{ value: options.dataViews[0].matrix.rows.levels[0].sources[0].displayName }, ...options.dataViews[0].matrix.columns.root.children];
+    headerData.pop();
+    headerData.push({ value: 'Total' });
+    headerData.push({ value: '%' });
 
     this.body.html("");
 
@@ -45,7 +48,7 @@ export class Visual implements IVisual {
     this.table.append("thead")
       .append("tr")
       .selectAll("th")
-      .data([{ value: options.dataViews[0].matrix.rows.levels[0].sources[0].displayName }, ...options.dataViews[0].matrix.columns.root.children, { value: 'Total' }])
+      .data(headerData)
       .enter().append("th")
       .style('position', 'sticky')
       .text(function (d: any) {
@@ -73,24 +76,37 @@ export class Visual implements IVisual {
     this.renderRows(rows, options, tbody);
   }
 
-  private renderRows(rows: any, options: any, tbody: Selection<HTMLTableSectionElement, any, any, any>) {
+  private renderRows(rows: any, options: any, tbody: Selection<HTMLTableSectionElement, any, any, any>, parentTotal?: number | null) {
+
+    const lastRowValues = rows[rows.length - 1].values;
+    const levelTotal = Object.values(lastRowValues).pop() as { value: number };
 
 
     rows.forEach((row: any) => {
       if (row.isSubtotal && row.level > 0) return
       if (row.isSubtotal) {
-        this.renderFooter(row);
+        this.renderFooter(row, parentTotal || levelTotal.value);
         return;
       }
       const subtotals = row.children?.find((r) => r.isSubtotal);
-      const values = subtotals ? Object.values(subtotals.values) : row.values ? Object.values(row.values) : [];
+      const values: { value: number }[] = subtotals ? Object.values(subtotals.values) : row.values ? Object.values(row.values) : [];
+      const currentTotal = values[values.length - 1]?.value || null;
+      if (parentTotal) {
+        const percent: number = (currentTotal || 0) * 100 / parentTotal;
+        values.push({ value: percent });
+      } else {
+
+        const percent: number = currentTotal * 100 / (levelTotal.value || 0);
+        values.push({ value: percent });
+      }
       const tr = tbody
         .append('tr')
         .selectAll('td')
         .data([{ value: row.isSubtotal ? 'Total' : row.value }, ...values])
         .enter()
         .append('td')
-        .html(function (d: any, index: number,) {
+        .html(function (d: any, index: number) {
+          if (index == values.length) return `${d.value.toFixed(0)} % `;
           if (typeof d.value == 'number')
             return f(d.value);
 
@@ -119,15 +135,18 @@ export class Visual implements IVisual {
 
 
       if (row.children) {
-        this.renderRows(row.children, options, tbody);
+        this.renderRows(row.children, options, tbody, currentTotal);
       }
     });
   }
 
 
-  private renderFooter(row: any) {
+  private renderFooter(row: any, parentTotal: number) {
 
-    const values = Object.values(row.values);
+    const values: { value: number }[] = Object.values(row.values);
+    const currentTotal = values[values.length - 1]?.value || null;
+    const percent: number = currentTotal * 100 / (parentTotal || 0);
+    values.push({ value: percent });
     const tfooter = this.table.append('tfoot');
     tfooter.append('tr')
       .selectAll('td')
@@ -135,15 +154,16 @@ export class Visual implements IVisual {
       .enter()
       .append('td')
       .html(function (d: any, index: number,) {
+        if (index == values.length) return `${d.value.toFixed(0)} % `;
         if (typeof d.value == 'number')
-          return f(d.value);
+          return `<b>${f(d.value)}</b>`;
 
         if (index == 0)
           return `<b>${d.value}</b>`
         return '';
       })
       .style('padding', function (d: any) {
-        return typeof (d.value) == "number" ? '0px 5px' : '0px 25px'
+        return typeof (d.value) == "number" ? '0px 5px' : '6px 6px 20px 6px'
       })
       .style('font-size', '13.3333px')
       .style('text-wrap', 'nowrap')
