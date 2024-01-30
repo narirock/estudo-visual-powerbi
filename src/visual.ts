@@ -1,7 +1,7 @@
 "use strict";
 
 import powerbi from "powerbi-visuals-api";
-import { formatLocale, text } from "d3";
+import { formatLocale } from "d3";
 
 import "./../style/visual.less";
 
@@ -18,7 +18,7 @@ const ptBR = formatLocale({
   currency: ["R$ ", ""],
 });
 
-const f = ptBR.format("($.2f");
+const f = ptBR.format("($,.0f");
 
 
 
@@ -39,7 +39,7 @@ export class Visual implements IVisual {
 
     this.table = this.body.append("table")
       .style('border-collapse', 'collapse')
-      .style('border', '2px #cfc7bb solid ')
+      .classed('table', true)
 
     this.table.append("thead")
       .append("tr")
@@ -49,10 +49,9 @@ export class Visual implements IVisual {
       .text(function (d: any) {
         return d.value;
       })
-      .style("border", "1px black solid")
+      .style('box-shadow', 'inset 0 -6px 0 -5px #FFAC00')
       .style("padding", "10px")
-      .style("background-color", "lightgray")
-      .style("font-weight", "bold");
+      .style("font-size", "13px");
 
     this.table.append('tbody')
       .style('overflow', 'auto')
@@ -86,25 +85,30 @@ export class Visual implements IVisual {
         .append('td')
         .html(function (d: any, index: number) {
           if (index == 0)
-            return `${'&nbsp;&nbsp;'.repeat(row.level || 0)}<span>+</span>&nbsp<b>${d.value}</b>`
-
+            return row.level > 0 ? `${'&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(row.level)}<span>+</span>&nbsp${d.value}` : `<span>+</span>&nbsp<b>${d.value}</b>`
 
           if (typeof d.value == 'number')
             return f(d.value);
 
           return '';
         })
-        .style('border-collapse', 'collapse')
-        .style('border', '2px #cfc7bb solid ')
         .style('padding', '0px 5px')
         .style('font-size', '13.3333px')
-        .style("background-color", function (d: { value: any }, index) {
+        .style('text-wrap', 'nowrap')
+        .style("color", function (d: { value: any }, index) {
           console.log(d);
           if (typeof (d.value) == "number" && d.value < 0) {
             return "red";
           }
-          return "white";
+          return "black";
         })
+        .style("text-align", function (d: { value: any }, index) {
+          return typeof (d.value) == "number" ? "right" : "left";
+        })
+        .style('border-right', function (_, index) {
+          if (index == 0) return '1px solid #FFAC00';
+          return '';
+        });
 
       // Chame recursivamente a função para processar as linhas filhas
       if (row.children) {
