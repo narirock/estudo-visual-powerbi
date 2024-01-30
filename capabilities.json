@@ -1,89 +1,143 @@
 {
-    "dataRoles": [
-      {
-        "name": "Line",
-        "displayName": "Linhas",
-        "displayNameKey": "Visual_Line",
-        "kind": "Grouping"
-      },
-      {
-        "name": "Column",
-        "displayName": "Colunas",
-        "displayNameKey": "Visual_Column",
-        "kind": "Grouping"
-      },
-      {
-        "name": "Value",
-        "displayName": "Valores",
-        "displayNameKey": "Visual_Values",
-        "kind": "Measure"
-      }
-    ],
-    "dataViewMappings": [
-      {
-        "matrix": {
-          "rows": {
-            "for": {
-              "in": "Line"
-            }
-          },
-          "columns": {
-            "for": {
-              "in": "Column"
-            }
-          },
-          "values": {
-            "select": [
-              {
-                "for": {
-                  "in": "Value"
-                }
-              }
-            ]
-          }
-        }
-      }
-    ],
-    "objects": {
-      "dataPoint": {
-        "properties": {
-          "defaultColor": {
-            "type": {
-              "fill": {
-                "solid": {
-                  "color": true
-                }
-              }
-            }
-          },
-          "showAllDataPoints": {
-            "type": {
-              "bool": true
-            }
-          },
-          "fill": {
-            "type": {
-              "fill": {
-                "solid": {
-                  "color": true
-                }
-              }
-            }
-          },
-          "fillRule": {
-            "type": {
-              "fill": {}
-            }
-          },
-          "fontSize": {
-            "type": {
-              "formatting": {
-                "fontSize": true
-              }
-            }
-          }
-        }
-      }
+  "dataRoles": [
+    {
+      "name": "Line",
+      "displayName": "Linhas",
+      "displayNameKey": "Visual_Line",
+      "kind": "Grouping"
     },
-    "privileges": []
+    {
+      "name": "Column",
+      "displayName": "Colunas",
+      "displayNameKey": "Visual_Column",
+      "kind": "Grouping"
+    },
+    {
+      "name": "Value",
+      "displayName": "Valores",
+      "displayNameKey": "Visual_Values",
+      "kind": "Measure"
+    }
+  ],
+  "dataViewMappings": [
+    {
+      "matrix": {
+        "rows": {
+          "for": {
+            "in": "Line"
+          }
+        },
+        "columns": {
+          "for": {
+            "in": "Column"
+          }
+        },
+        "values": {
+          "select": [
+            {
+              "for": {
+                "in": "Value"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "objects": {
+    "dataPoint": {
+      "properties": {
+        "defaultColor": {
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "showAllDataPoints": {
+          "type": {
+            "bool": true
+          }
+        },
+        "fill": {
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "fillRule": {
+          "type": {
+            "fill": {}
+          }
+        },
+        "fontSize": {
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "privileges": [],
+  "subtotals": {
+    "matrix": {
+      "rowSubtotals": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "rowSubtotals"
+        },
+        "defaultValue": true
+      },
+      "rowSubtotalsPerLevel": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "perRowLevel"
+        },
+        "defaultValue": false
+      },
+      "columnSubtotals": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "columnSubtotals"
+        },
+        "defaultValue": true
+      },
+      "columnSubtotalsPerLevel": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "perColumnLevel"
+        },
+        "defaultValue": false
+      },
+      "levelSubtotalEnabled": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "levelSubtotalEnabled"
+        },
+        "defaultValue": true
+      },
+      "rowSubtotalsType": {
+        "propertyIdentifier": {
+          "objectName": "subtotals",
+          "propertyName": "rowSubtotalsType"
+        },
+        "defaultValue": "Bottom"
+      }
+    }
+  },
+  "expandCollapse": {
+    "roles": [
+      "Rows"
+    ],
+    "addDataViewFlags": {
+      "defaultValue": true
+    }
   }
+}
