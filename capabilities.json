@@ -139,5 +139,6 @@
     "addDataViewFlags": {
       "defaultValue": true
     }
-  }
+  },
+  "suppressDefaultTitle": true
 }
