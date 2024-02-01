@@ -26,12 +26,11 @@ export class Visual implements IVisual {
 
   constructor(options: VisualConstructorOptions) {
     this.body = select(options.element).append("body");
-    console.log("created");
   }
 
   // eslint-disable-next-line max-lines-per-function
   public update(options: VisualUpdateOptions) {
-
+    console.log(options);
     this.body.html("");
     this.table = this.body.append("table")
       .style('border-collapse', 'collapse')
@@ -47,9 +46,11 @@ export class Visual implements IVisual {
 
   private renderHeader(options: VisualUpdateOptions) {
     try {
-      const headerData = [{ displayName: options.dataViews[0].matrix.rows.levels[0].sources[0].displayName }, ...options.dataViews[0].matrix.columns.levels[0].sources];
-      headerData.pop();
-      headerData.push({ displayName: 'Total' });
+      const matrix = options.dataViews[0].matrix;
+      console.log(matrix);
+      if (!matrix.rows) return;
+      const headerData = [{ displayName: matrix.rows?.levels[0].sources[0].displayName || '' }, ...matrix.columns.levels[0].sources];
+
       headerData.push({ displayName: '%' });
 
       this.table.append("thead")
@@ -83,7 +84,6 @@ export class Visual implements IVisual {
     const levelTotal = Object.values(lastRowValues).pop() as { value: number };
 
     rows.forEach((row: any) => {
-      console.log(row);
       if (row.isSubtotal && row.level > 0) return
 
       if (row.isSubtotal) {

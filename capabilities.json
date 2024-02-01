@@ -35,11 +35,6 @@
         "values": {
           "select": [
             {
-              "bind": {
-                "to": "value"
-              }
-            },
-            {
               "for": {
                 "in": "Value"
               }
@@ -137,18 +132,5 @@
       }
     }
   },
-  "expandCollapse": {
-    "roles": [
-      "Line"
-    ],
-    "addDataViewFlags": {
-      "defaultValue": true
-    }
-  },
-  "suppressDefaultTitle": true,
-  "drilldown": {
-    "roles": [
-      "Line"
-    ]
-  }
+  "suppressDefaultTitle": true
 }
