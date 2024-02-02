@@ -25,33 +25,51 @@ export class Visual implements IVisual {
   private table: any;
 
   constructor(options: VisualConstructorOptions) {
-    this.body = select(options.element).append("body");
+    this.body = select(options.element).append("body").style('overflow', 'auto');
   }
 
   // eslint-disable-next-line max-lines-per-function
   public update(options: VisualUpdateOptions) {
-    console.log(options);
-    this.body.html("");
-    this.table = this.body.append("table")
-      .style('border-collapse', 'collapse')
-      .classed('table', true);
+    const matrix = options?.dataViews[0]?.matrix;
+    if (!matrix) return;
+    try {
+      this.body.html("");
+      this.table = this.body.append("table")
+        .style('border-collapse', 'collapse')
+        .classed('table', true);
 
-    this.renderHeader(options);
-    this.table.append('tbody')
-      .style('overflow', 'auto');
+      this.renderHeader(options);
+      this.table?.append('tbody')
+        .style('overflow', 'auto')
+        .style('height', '90%');
 
-    this.renderTableBody(options.dataViews[0].matrix.rows.root.children, options);
+      this.renderTableBody(matrix.rows.root.children, options);
+    } catch (e) {
+      console.log(e);
+    }
   }
-
 
   private renderHeader(options: VisualUpdateOptions) {
     try {
-      const matrix = options.dataViews[0].matrix;
-      console.log(matrix);
-      if (!matrix.rows) return;
-      const headerData = [{ displayName: matrix.rows?.levels[0].sources[0].displayName || '' }, ...matrix.columns.levels[0].sources];
 
-      headerData.push({ displayName: '%' });
+      const matrix = options.dataViews[0].matrix;
+
+      if (!matrix?.rows) return;
+
+      let columns = matrix.columns.root.children.filter((c) => c.value).map((column: any) => {
+        let col = matrix.columns.levels[column?.level || 0].sources[column?.levelValues?.levelSourceIndex || 0] as any;
+        return { value: column.value };
+      })
+
+      if (columns.length == 0) {
+        columns = matrix.columns.levels[0].sources.map((column: any) => {
+          console.log(column, "TEste");
+          return { value: column.displayName };
+        })
+      }
+      const headerData = [{ value: matrix.rows?.levels[0].sources[0].displayName || '' }, ...columns];
+
+      headerData.push({ value: '%' });
 
       this.table.append("thead")
         .append("tr")
@@ -60,19 +78,20 @@ export class Visual implements IVisual {
         .enter().append("th")
         .style('position', 'sticky')
         .text(function (d: any) {
-          return d.displayName;
+          return d.value || d.displayName;
         });
     } catch (e) {
       console.log(e);
     }
   }
 
-
   private renderTableBody(rows: any, options: any) {
-    let tbody = this.table.select('tbody');
+
+
+    let tbody = this.table?.select('tbody');
 
     if (tbody.empty()) {
-      tbody = this.table.append('tbody');
+      tbody = this.table?.append('tbody');
     }
 
     this.renderRows(rows, options, tbody);
@@ -81,9 +100,11 @@ export class Visual implements IVisual {
   private renderRows(rows: any, options: any, tbody: Selection<HTMLTableSectionElement, any, any, any>, parentTotal?: number | null) {
 
     const lastRowValues = rows[rows.length - 1].values;
-    const levelTotal = Object.values(lastRowValues).pop() as { value: number };
+    let levelTotal: { value: number } | undefined;
+    if (lastRowValues)
+      levelTotal = Object.values(lastRowValues).pop() as { value: number };
 
-    rows.forEach((row: any) => {
+    rows?.forEach((row: any) => {
       if (row.isSubtotal && row.level > 0) return
 
       if (row.isSubtotal) {
@@ -100,7 +121,7 @@ export class Visual implements IVisual {
       if (parentTotal) {
         percent = (currentTotal || 0) * 100 / parentTotal;
       } else {
-        percent = currentTotal * 100 / (levelTotal.value || 0);
+        percent = levelTotal ? (currentTotal * 100 / (levelTotal.value || 0)) : 0;
       }
       values.push({ value: !isNaN(percent) ? percent : null });
 
